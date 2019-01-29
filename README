@@ -1,0 +1,5 @@
+La compilation s'effectue à partir de deux Makefile :
+Le premier fichier permettra, à terme, de construire tous les programmes liés au serveur web : le serveur ainsi que les
+programmes de gestion.
+Le second est un Makefile plus compliqué mais qui nous rendra la tâche plus simple par la
+suite. Il fera usage des règles génériques, de l’inclusion de fichiers et de la génération automatique de dépendances.
