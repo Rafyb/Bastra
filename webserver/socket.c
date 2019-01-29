@@ -1,3 +1,4 @@
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
@@ -22,4 +23,3 @@ int creer_serveur(int port) {
         /* traitement de l ’ erreur */
     }
     return socket_serveur;
-}
