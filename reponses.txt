@@ -4,4 +4,6 @@
 
     2) le client se connecte mais l'option -z empeche toute impression, prend tout de même en compte la seconde d'attente.
 
-    
+    3) "telnet ::1 8080" se connecte par IPV6 au serveur, sauf que le serveur utilise une socket IPV4, la connection echoue.
+
+    4) le premier c'est connecté et le deuxieme n'a donc pas eu le temps de se connecter, le serveur prend donc qu'un seul client à la fois.
