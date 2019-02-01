@@ -36,7 +36,28 @@ int creer_serveur(int port) {
     /* traitement d ’ erreur */
     }
     /* On peut maintenant dialoguer avec le client */
-    const char * message_bienvenue = " Bonjour , bienvenue sur mon serveur \n " ;
-    write ( socket_client , message_bienvenue , strlen ( message_bienvenue ));
+    sleep(1);
+    const char * message_bienvenue1 = "  __________________________________________\n " ;
+    const char * message_bienvenue2 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
+    const char * message_bienvenue3 = "|__________________________________________|\n ";
+    const char * message_bienvenue4 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
+    const char * message_bienvenue5 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
+    const char * message_bienvenue6 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
+    const char * message_bienvenue7 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
+    const char * message_bienvenue8 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
+    const char * message_bienvenue9 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
+    const char * message_bienvenue10 = "|__________________________________________|\n " ;
+    write ( socket_client , message_bienvenue1 , strlen ( message_bienvenue1 ));
+    write ( socket_client , message_bienvenue2 , strlen ( message_bienvenue2 ));
+    write ( socket_client , message_bienvenue3 , strlen ( message_bienvenue3 ));
+    write ( socket_client , message_bienvenue4 , strlen ( message_bienvenue4 ));
+    write ( socket_client , message_bienvenue5 , strlen ( message_bienvenue5 ));
+    write ( socket_client , message_bienvenue6 , strlen ( message_bienvenue6 ));
+    write ( socket_client , message_bienvenue7 , strlen ( message_bienvenue7 ));
+    write ( socket_client , message_bienvenue8 , strlen ( message_bienvenue8 ));
+    write ( socket_client , message_bienvenue9 , strlen ( message_bienvenue9 ));
+    write ( socket_client , message_bienvenue10 , strlen ( message_bienvenue10 ));
+
+
     return socket_serveur;
 }

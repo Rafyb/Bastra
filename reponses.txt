@@ -1,0 +1,7 @@
+3.2.1
+
+    1) le serveur ne se relance pas : "bind socket_serveur : adress already in use"
+
+    2) le client se connecte mais l'option -z empeche toute impression, prend tout de même en compte la seconde d'attente.
+
+    
