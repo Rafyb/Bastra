@@ -1,6 +1,8 @@
 # include <stdio.h>
 # include <string.h>
-int main( int argc , char** argv )
+#include "socket.h"
+int main(void)
 {
-    int serveur = creer_serveur(8080);
+    creer_serveur(8080);
+
 }
