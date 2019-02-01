@@ -7,9 +7,36 @@
 #include <unistd.h>
 #include <string.h>
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <stdlib.h>
 
 
-void initialiser_signaux ( void );
+
+void traitement_signal (int sig) {
+    //printf ( " Signal %d reçu \n " , sig );
+    //waitpid(pid,NULL,WNOHANG);
+    if(SIGCHLD == sig){
+        waitpid(-1,NULL,WNOHANG);
+    }
+    //exit(0);
+}
+
+void initialiser_signaux ( void ) {
+    if ( signal ( SIGPIPE , SIG_IGN ) == SIG_ERR )  {
+        perror ( " signal " );
+    }
+    struct sigaction sa ;
+    sa . sa_handler = traitement_signal ;
+    sigemptyset (& sa . sa_mask );
+    sa . sa_flags = SA_RESTART ;
+    if ( sigaction ( SIGCHLD , & sa , NULL ) == -1)
+    {
+    perror ( " sigaction ( SIGCHLD ) " );
+    }
+
+   
+}
 
 int creer_serveur(int port) {
     int socket_serveur;
@@ -50,8 +77,7 @@ int creer_serveur(int port) {
     if(pid) {
         close(socket_client);
     }
-    }
-    
+    }    
     /* On peut maintenant dialoguer avec le client */
     
 
@@ -76,12 +102,9 @@ int creer_serveur(int port) {
     write ( socket_client , message_bienvenue9 , strlen ( message_bienvenue9 ));
     write ( socket_client , message_bienvenue10 , strlen ( message_bienvenue10 ));
     sleep(1);
+    
+    
 
     return socket_serveur;
 }
 
-void initialiser_signaux ( void ) {
-    if ( signal ( SIGPIPE , SIG_IGN ) == SIG_ERR )  {
-        perror ( " signal " );
-    }
-}
