@@ -6,7 +6,10 @@
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
+#include <signal.h>
 
+
+void initialiser_signaux ( void );
 
 int creer_serveur(int port) {
     int socket_serveur;
@@ -33,6 +36,7 @@ int creer_serveur(int port) {
         perror ( " listen socket_serveur " );
         /* traitement d ’ erreur */
     }
+    initialiser_signaux();
     int socket_client ;
     socket_client = accept ( socket_serveur , NULL , NULL );
     if ( socket_client == -1)
@@ -41,7 +45,7 @@ int creer_serveur(int port) {
     /* traitement d ’ erreur */
     }
     /* On peut maintenant dialoguer avec le client */
-    sleep(1);
+    
     const char * message_bienvenue1 = "  __________________________________________\n " ;
     const char * message_bienvenue2 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
     const char * message_bienvenue3 = "|__________________________________________|\n ";
@@ -62,7 +66,13 @@ int creer_serveur(int port) {
     write ( socket_client , message_bienvenue8 , strlen ( message_bienvenue8 ));
     write ( socket_client , message_bienvenue9 , strlen ( message_bienvenue9 ));
     write ( socket_client , message_bienvenue10 , strlen ( message_bienvenue10 ));
-
+    sleep(1);
 
     return socket_serveur;
+}
+
+void initialiser_signaux ( void ) {
+    if ( signal ( SIGPIPE , SIG_IGN ) == SIG_ERR )  {
+        perror ( " signal " );
+    }
 }
