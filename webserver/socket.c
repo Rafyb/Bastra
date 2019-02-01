@@ -38,14 +38,23 @@ int creer_serveur(int port) {
     }
     initialiser_signaux();
     int socket_client ;
+    int pid = 1;
+    while(pid) {
     socket_client = accept ( socket_serveur , NULL , NULL );
     if ( socket_client == -1)
     {
     perror ( " accept " );
     /* traitement d ’ erreur */
     }
+    pid = fork();
+    if(pid) {
+        close(socket_client);
+    }
+    }
+    
     /* On peut maintenant dialoguer avec le client */
     
+
     const char * message_bienvenue1 = "  __________________________________________\n " ;
     const char * message_bienvenue2 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
     const char * message_bienvenue3 = "|__________________________________________|\n ";
