@@ -91,7 +91,7 @@ int creer_serveur(int port) {
     const char * message_bienvenue8 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
     const char * message_bienvenue9 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
     const char * message_bienvenue10 = "|__________________________________________|\n " ;
-    write ( socket_client , message_bienvenue1 , strlen ( message_bienvenue1 ));
+    write ( socket_client , message_bienvenue1 , strlen ( message_bienvenue1 ) );
     write ( socket_client , message_bienvenue2 , strlen ( message_bienvenue2 ));
     write ( socket_client , message_bienvenue3 , strlen ( message_bienvenue3 ));
     write ( socket_client , message_bienvenue4 , strlen ( message_bienvenue4 ));
@@ -103,7 +103,12 @@ int creer_serveur(int port) {
     write ( socket_client , message_bienvenue10 , strlen ( message_bienvenue10 ));
     sleep(1);
     
-    
+    char * msg = "";
+    int size = 0;
+    while(1){
+        size = read(socket_client,msg,200);
+        write(socket_client,msg,size);
+    }
 
     return socket_serveur;
 }
