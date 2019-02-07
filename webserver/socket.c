@@ -85,6 +85,19 @@ int creer_serveur(int port) {
     /* On peut maintenant dialoguer avec le client */
     sleep(1);
 
+    const int TAILLE_MAX = 255;
+    FILE *f = fdopen(socket_client,"w+");
+    char* buffer = malloc(sizeof(char)*TAILLE_MAX);
+        char* arg = "%s";
+    
+    fgets(buffer,TAILLE_MAX,f);
+    if(strcmp(buffer,"GET / HTTP/1.1\r\n")!=0){
+        char * error = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: 17\r\n\r\n400 Bad request\r\n";
+        fprintf(f,arg,error);
+    }
+    printf(arg,buffer);
+    
+
     const char * message_bienvenue1 = " _______                         __                          \n" ;
     const char * message_bienvenue2 = "/       \\                       /  |                         \n";
     const char * message_bienvenue3 = "███████  |  ______    _______  _██ |_     ______    ______   \n";
@@ -111,15 +124,9 @@ int creer_serveur(int port) {
     write ( socket_client , message_bienvenue12 , strlen ( message_bienvenue12 ));
     
     /* Lecture de l'entrée et renvoie le message */
-    freading(socket_client);
-    /*const int TAILLE_MAX = 255;
-    FILE *f = fdopen(socket_client,"w+");
-    char* buffer = malloc(sizeof(char)*TAILLE_MAX);
-    while(fgets(buffer,TAILLE_MAX,f)!=NULL) {
-        char* arg = "<BastRa> %s";
-        fprintf(f,arg,buffer);
-    }
-    */
+    //freading(socket_client);
+ 
+    
     return socket_serveur;
 }
 
