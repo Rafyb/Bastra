@@ -6,37 +6,9 @@
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <stdlib.h>
 
 
-
-void traitement_signal (int sig) {
-    //printf ( " Signal %d reçu \n " , sig );
-    //waitpid(pid,NULL,WNOHANG);
-    if(SIGCHLD == sig){
-        waitpid(-1,NULL,WNOHANG);
-    }
-    //exit(0);
-}
-
-void initialiser_signaux ( void ) {
-    if ( signal ( SIGPIPE , SIG_IGN ) == SIG_ERR )  {
-        perror ( " signal " );
-    }
-    struct sigaction sa ;
-    sa . sa_handler = traitement_signal ;
-    sigemptyset (& sa . sa_mask );
-    sa . sa_flags = SA_RESTART ;
-    if ( sigaction ( SIGCHLD , & sa , NULL ) == -1)
-    {
-    perror ( " sigaction ( SIGCHLD ) " );
-    }
-
-   
-}
 
 int creer_serveur(int port) {
     int socket_serveur;
@@ -45,14 +17,17 @@ int creer_serveur(int port) {
         /* traitement de l ’ erreur */
         perror( " socket_serveur " );
     }
+
     /* Utilisation de la socket serveur */
     struct sockaddr_in saddr;
     saddr.sin_family = AF_INET; /* Socket ipv4 */
     saddr.sin_port = htons(port); /* Port d ’écoute */
     saddr.sin_addr.s_addr = INADDR_ANY ; /* écoute sur toutes les interfaces */
     int optval = 1;
+
     if ( setsockopt ( socket_serveur , SOL_SOCKET , SO_REUSEADDR , & optval , sizeof ( int )) == -1) {
         perror ( " Can not set SO_REUSEADDR option " );
+        /* traitement de l ’ erreur */
     }
   
     if ( bind ( socket_serveur , ( struct sockaddr *)& saddr , sizeof ( saddr )) == -1) {
@@ -63,23 +38,24 @@ int creer_serveur(int port) {
         perror ( " listen socket_serveur " );
         /* traitement d ’ erreur */
     }
-    initialiser_signaux();
+
     int socket_client ;
     int pid = 1;
     while(pid) {
-    socket_client = accept ( socket_serveur , NULL , NULL );
-    if ( socket_client == -1)
-    {
-    perror ( " accept " );
-    /* traitement d ’ erreur */
-    }
-    pid = fork();
-    if(pid) {
-        close(socket_client);
-    }
+        socket_client = accept ( socket_serveur , NULL , NULL );
+        if ( socket_client == -1){
+            perror ( " accept " );
+            /* traitement d ’ erreur */
+        }
+        printf("Client connected");
+        pid = fork();
+        if(pid) {
+            close(socket_client);
+        }
     }    
-    /* On peut maintenant dialoguer avec le client */
     
+    /* On peut maintenant dialoguer avec le client */
+    sleep(1);
 
     const char * message_bienvenue1 = "  __________________________________________\n " ;
     const char * message_bienvenue2 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
@@ -101,13 +77,19 @@ int creer_serveur(int port) {
     write ( socket_client , message_bienvenue8 , strlen ( message_bienvenue8 ));
     write ( socket_client , message_bienvenue9 , strlen ( message_bienvenue9 ));
     write ( socket_client , message_bienvenue10 , strlen ( message_bienvenue10 ));
-    sleep(1);
     
-    char * msg = "";
-    int size = 0;
+    /* Lecture de l'entrée et renvoie le message */
+    const int TAILLE_MAX = 255;
     while(1){
-        size = read(socket_client,msg,200);
-        write(socket_client,msg,size);
+        char buffer_tmp[TAILLE_MAX];
+        int size = read(socket_client, buffer_tmp,TAILLE_MAX);
+        if(size>TAILLE_MAX){
+            write(socket_client, "Chaine trop grande\n",19);
+        } else {
+        write(socket_client, message, size);
+        char * message = malloc(size);
+        strcpy(message, buffer_tmp);
+        } 
     }
 
     return socket_serveur;
