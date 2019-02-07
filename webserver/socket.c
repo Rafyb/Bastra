@@ -8,10 +8,23 @@
 #include <string.h>
 #include <stdlib.h>
 
+
+int freading(int socket_client) {
+    const int TAILLE_MAX = 255;
+    FILE *f = fdopen(socket_client,"w+");
+    char* buffer = malloc(sizeof(char)*TAILLE_MAX);
+    while(fgets(buffer,TAILLE_MAX,f)!=NULL) {
+        char* arg = "<BastRa> %s";
+        fprintf(f,arg,buffer);
+    }
+    return 1;
+}
+
 int reading(int socket_client){
     const int TAILLE_MAX = 255;
     char buffer_tmp[TAILLE_MAX];
     int size;
+    
     while((size = read(socket_client, buffer_tmp,TAILLE_MAX))){
         if(size>TAILLE_MAX){
             write(socket_client, "Chaine trop grande\n",19);
@@ -98,8 +111,15 @@ int creer_serveur(int port) {
     write ( socket_client , message_bienvenue12 , strlen ( message_bienvenue12 ));
     
     /* Lecture de l'entrée et renvoie le message */
-    reading(socket_client);
-
+    freading(socket_client);
+    /*const int TAILLE_MAX = 255;
+    FILE *f = fdopen(socket_client,"w+");
+    char* buffer = malloc(sizeof(char)*TAILLE_MAX);
+    while(fgets(buffer,TAILLE_MAX,f)!=NULL) {
+        char* arg = "<BastRa> %s";
+        fprintf(f,arg,buffer);
+    }
+    */
     return socket_serveur;
 }
 
