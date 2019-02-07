@@ -8,6 +8,21 @@
 #include <string.h>
 #include <stdlib.h>
 
+int reading(int socket_client){
+    const int TAILLE_MAX = 255;
+    while(1){
+        char buffer_tmp[TAILLE_MAX];
+        int size = read(socket_client, buffer_tmp,TAILLE_MAX);
+
+        if(size>TAILLE_MAX){
+            write(socket_client, "Chaine trop grande\n",19);
+        } else {
+                char * message = malloc(size);
+            strcpy(message, buffer_tmp);
+            write(socket_client, message, size);
+        } 
+    }
+}
 
 
 int creer_serveur(int port) {
@@ -57,16 +72,18 @@ int creer_serveur(int port) {
     /* On peut maintenant dialoguer avec le client */
     sleep(1);
 
-    const char * message_bienvenue1 = "  __________________________________________\n " ;
-    const char * message_bienvenue2 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
-    const char * message_bienvenue3 = "|__________________________________________|\n ";
-    const char * message_bienvenue4 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
-    const char * message_bienvenue5 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
-    const char * message_bienvenue6 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
-    const char * message_bienvenue7 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
-    const char * message_bienvenue8 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
-    const char * message_bienvenue9 = "|Bonjour , bienvenue sur le serveur Bastra |\n " ;
-    const char * message_bienvenue10 = "|__________________________________________|\n " ;
+    const char * message_bienvenue1 = " _______                         __                          \n" ;
+    const char * message_bienvenue2 = "/       \\                       /  |                         \n";
+    const char * message_bienvenue3 = "███████  |  ______    _______  _██ |_     ______    ______   \n";
+    const char * message_bienvenue4 = "██ |__██ | /      \\  /       |/ ██   |   /      \\  /      \\  \n" ;
+    const char * message_bienvenue5 = "██    ██<  ██████  |/███████/ ██████/   /██████  | ██████  | \n" ;
+    const char * message_bienvenue6 = "███████  | /    ██ |██      \\   ██ | __ ██ |  ██/  /    ██ | \n" ;
+    const char * message_bienvenue7 = "██ |__██ |/███████ | ██████  |  ██ |/  |██ |      /███████ | \n" ;
+    const char * message_bienvenue8 = "██    ██/ ██    ██ |/     ██/   ██  ██/ ██ |      ██    ██ | \n";
+    const char * message_bienvenue9 = "███████/   ███████/ ███████/     ████/  ██_/        ███████/  \n" ;
+    const char * message_bienvenue10 = " \n" ;
+    const char * message_bienvenue11 = " \n";
+    const char * message_bienvenue12 = "\n";
     write ( socket_client , message_bienvenue1 , strlen ( message_bienvenue1 ) );
     write ( socket_client , message_bienvenue2 , strlen ( message_bienvenue2 ));
     write ( socket_client , message_bienvenue3 , strlen ( message_bienvenue3 ));
@@ -77,20 +94,11 @@ int creer_serveur(int port) {
     write ( socket_client , message_bienvenue8 , strlen ( message_bienvenue8 ));
     write ( socket_client , message_bienvenue9 , strlen ( message_bienvenue9 ));
     write ( socket_client , message_bienvenue10 , strlen ( message_bienvenue10 ));
+    write ( socket_client , message_bienvenue11 , strlen ( message_bienvenue11 ));
+    write ( socket_client , message_bienvenue12 , strlen ( message_bienvenue12 ));
     
     /* Lecture de l'entrée et renvoie le message */
-    const int TAILLE_MAX = 255;
-    while(1){
-        char buffer_tmp[TAILLE_MAX];
-        int size = read(socket_client, buffer_tmp,TAILLE_MAX);
-        if(size>TAILLE_MAX){
-            write(socket_client, "Chaine trop grande\n",19);
-        } else {
-        write(socket_client, message, size);
-        char * message = malloc(size);
-        strcpy(message, buffer_tmp);
-        } 
-    }
+    reading(socket_client);
 
     return socket_serveur;
 }
