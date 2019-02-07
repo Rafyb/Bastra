@@ -10,10 +10,9 @@
 
 int reading(int socket_client){
     const int TAILLE_MAX = 255;
-    while(1){
-        char buffer_tmp[TAILLE_MAX];
-        int size = read(socket_client, buffer_tmp,TAILLE_MAX);
-
+    char buffer_tmp[TAILLE_MAX];
+    int size;
+    while((size = read(socket_client, buffer_tmp,TAILLE_MAX))){
         if(size>TAILLE_MAX){
             write(socket_client, "Chaine trop grande\n",19);
         } else {
@@ -22,6 +21,7 @@ int reading(int socket_client){
             write(socket_client, message, size);
         } 
     }
+    return 1;
 }
 
 
@@ -62,7 +62,7 @@ int creer_serveur(int port) {
             perror ( " accept " );
             /* traitement d ’ erreur */
         }
-        printf("Client connected");
+        //printf("Client connected");
         pid = fork();
         if(pid) {
             close(socket_client);
