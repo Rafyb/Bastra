@@ -113,12 +113,30 @@ int main(void)
     char* arg = "%s";
     fgets(buffer,TAILLE_MAX,f);
 
+    /* lire lien entete 
+    char* lien = strstr(buffer,"/");
+    if (lien==NULL){
+        char * error = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: 17\r\n\r\n400 Bad request\r\n";
+        fprintf(f,arg,error);
+        exit(1);
+    }
+    printf("%s\n",lien);
+    */
+
+
     /* verification methode appelee */
+    if(strcmp(buffer,"GET /inexistant HTTP/1.1\r\n")==0){ // ERREUR 404
+        char* error = "HTTP/1.1 404 Not found\r\nConnection: close\r\nContent-Length: 18\r\n\r\n404 Not found\r\n";
+        fprintf(f,arg,error);
+        exit(404);
+    }
+
     if(strcmp(buffer,"GET / HTTP/1.1\r\n")!=0){ // ERREUR 400
         char * error = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: 17\r\n\r\n400 Bad request\r\n";
         fprintf(f,arg,error);
         exit(1);
     }
+    
 
     /* lire ligne jusqu'à ligne vide */
     fgets(buffer,TAILLE_MAX,f);
