@@ -68,6 +68,26 @@ void initialiser_signaux ( void ) {
 
 int main(void)
 {
+    /* message bienvenue */
+    const char * message_bienvenue1 = " _______                         __                          \n" ;
+    const char * message_bienvenue2 = "/       \\                       /  |                         \n";
+    const char * message_bienvenue3 = "███████  |  ______    _______  _██ |_     ______    ______   \n";
+    const char * message_bienvenue4 = "██ |__██ | /      \\  /       |/ ██   |   /      \\  /      \\  \n" ;
+    const char * message_bienvenue5 = "██    ██<  ██████  |/███████/ ██████/   /██████  | ██████  | \n" ;
+    const char * message_bienvenue6 = "███████  | /    ██ |██      \\   ██ | __ ██ |  ██/  /    ██ | \n" ;
+    const char * message_bienvenue7 = "██ |__██ |/███████ | ██████  |  ██ |/  |██ |      /███████ | \n" ;
+    const char * message_bienvenue8 = "██    ██/ ██    ██ |/     ██/   ██  ██/ ██ |      ██    ██ | \n";
+    const char * message_bienvenue9 = "███████/   ███████/ ███████/     ████/  ██_/        ███████/  \n" ;
+    const char * message_bienvenue10 = " \n" ;
+    const char * message_bienvenue11 = " \n";
+    const char * message_bienvenue12 = "\n";
+    int size = 0;
+    size += strlen(message_bienvenue1) + strlen(message_bienvenue1) +  strlen(message_bienvenue2) +  strlen(message_bienvenue3) + 
+    strlen(message_bienvenue4) +  strlen(message_bienvenue5) +  strlen(message_bienvenue6) +  strlen(message_bienvenue7) + 
+    strlen(message_bienvenue8) + strlen(message_bienvenue9) + strlen(message_bienvenue10) + strlen(message_bienvenue11) + 
+    strlen(message_bienvenue12); 
+    
+    /* initialisation */
     initialiser_signaux();
     int socket_serveur = creer_serveur(8080);
 
@@ -81,58 +101,39 @@ int main(void)
             perror ( " accept " );
             /* traitement d ’ erreur */
         }
-        //printf("Client connected");
         pid = fork();
         if(pid) {
             close(socket_client);
         }
     }    
-    
-    sleep(1);
-
+ 
     const int TAILLE_MAX = 255;
     FILE *f = fdopen(socket_client,"w+"); 
     char* buffer = malloc(sizeof(char)*TAILLE_MAX);
     char* arg = "%s";
     fgets(buffer,TAILLE_MAX,f);
 
-    /* verficiation methode appelee */
-    if(strcmp(buffer,"GET / HTTP/1.1\r\n")!=0){
+    /* verification methode appelee */
+    if(strcmp(buffer,"GET / HTTP/1.1\r\n")!=0){ // ERREUR 400
         char * error = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: 17\r\n\r\n400 Bad request\r\n";
         fprintf(f,arg,error);
+        exit(1);
     }
 
-    printf(arg,buffer);
-    
-    /* message bienvenue */
+    /* lire ligne jusqu'à ligne vide */
+    fgets(buffer,TAILLE_MAX,f);
+    while(strcmp(buffer,"\r\n")!=0) {
+        printf(arg,buffer);
+        fgets(buffer,TAILLE_MAX,f);
+    }
 
-    const char * message_bienvenue1 = " _______                         __                          \n" ;
-    const char * message_bienvenue2 = "/       \\                       /  |                         \n";
-    const char * message_bienvenue3 = "███████  |  ______    _______  _██ |_     ______    ______   \n";
-    const char * message_bienvenue4 = "██ |__██ | /      \\  /       |/ ██   |   /      \\  /      \\  \n" ;
-    const char * message_bienvenue5 = "██    ██<  ██████  |/███████/ ██████/   /██████  | ██████  | \n" ;
-    const char * message_bienvenue6 = "███████  | /    ██ |██      \\   ██ | __ ██ |  ██/  /    ██ | \n" ;
-    const char * message_bienvenue7 = "██ |__██ |/███████ | ██████  |  ██ |/  |██ |      /███████ | \n" ;
-    const char * message_bienvenue8 = "██    ██/ ██    ██ |/     ██/   ██  ██/ ██ |      ██    ██ | \n";
-    const char * message_bienvenue9 = "███████/   ███████/ ███████/     ████/  ██_/        ███████/  \n" ;
-    const char * message_bienvenue10 = " \n" ;
-    const char * message_bienvenue11 = " \n";
-    const char * message_bienvenue12 = "\n";
-    write ( socket_client , message_bienvenue1 , strlen ( message_bienvenue1 ) );
-    write ( socket_client , message_bienvenue2 , strlen ( message_bienvenue2 ));
-    write ( socket_client , message_bienvenue3 , strlen ( message_bienvenue3 ));
-    write ( socket_client , message_bienvenue4 , strlen ( message_bienvenue4 ));
-    write ( socket_client , message_bienvenue5 , strlen ( message_bienvenue5 ));
-    write ( socket_client , message_bienvenue6 , strlen ( message_bienvenue6 ));
-    write ( socket_client , message_bienvenue7 , strlen ( message_bienvenue7 ));
-    write ( socket_client , message_bienvenue8 , strlen ( message_bienvenue8 ));
-    write ( socket_client , message_bienvenue9 , strlen ( message_bienvenue9 ));
-    write ( socket_client , message_bienvenue10 , strlen ( message_bienvenue10 ));
-    write ( socket_client , message_bienvenue11 , strlen ( message_bienvenue11 ));
-    write ( socket_client , message_bienvenue12 , strlen ( message_bienvenue12 ));
-    
-    /* Lecture de l'entrée et renvoie le message */
-    //freading(socket_client);
- 
+    /* requete correcte */
+    arg = "%s %d%s";
+    fprintf(f,arg,"HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length:",size,"\r\n\r\n");
+    fprintf(f,"%s%s%s%s%s%s%s%s%s%s%s%s",message_bienvenue1,message_bienvenue2,message_bienvenue3,message_bienvenue4,
+    message_bienvenue5,message_bienvenue6,message_bienvenue7,message_bienvenue8,
+    message_bienvenue9,message_bienvenue10,message_bienvenue11,message_bienvenue12);
+   
+
     return 0;
 }
