@@ -9,6 +9,28 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 
+/*
+enum http_method {
+    HTTP_GET ,
+    HTTP_UNSUPPORTED ,
+};
+
+typedef struct {
+    enum http_method method ;
+    int major_version ;
+    int minor_version ;
+    char target [ MAX_TARGET_SIZE ];
+} http_request ;
+*/
+
+char * fgets_or_exit ( char * buffer , int size , FILE * stream ){
+    char * re = fgets(buffer,size,stream);
+    if( re =='\0'){
+        exit(1);
+    }
+    return re;
+}
+
 
 int freading(int socket_client) {
     const int TAILLE_MAX = 255;
@@ -77,7 +99,7 @@ int main(void)
     const char * message_bienvenue6 = "███████  | /    ██ |██      \\   ██ | __ ██ |  ██/  /    ██ | \n" ;
     const char * message_bienvenue7 = "██ |__██ |/███████ | ██████  |  ██ |/  |██ |      /███████ | \n" ;
     const char * message_bienvenue8 = "██    ██/ ██    ██ |/     ██/   ██  ██/ ██ |      ██    ██ | \n";
-    const char * message_bienvenue9 = "███████/   ███████/ ███████/     ████/  ██_/        ███████/  \n" ;
+    const char * message_bienvenue9 = "███████/   ███████/ ███████/     ████/  ██_/       ███████/   \n" ;
     const char * message_bienvenue10 = " \n" ;
     const char * message_bienvenue11 = " \n";
     const char * message_bienvenue12 = "\n";
@@ -111,7 +133,7 @@ int main(void)
     FILE *f = fdopen(socket_client,"w+"); 
     char* buffer = malloc(sizeof(char)*TAILLE_MAX);
     char* arg = "%s";
-    fgets(buffer,TAILLE_MAX,f);
+    fgets_or_exit(buffer,TAILLE_MAX,f);
 
     /* lire lien entete 
     char* lien = strstr(buffer,"/");
@@ -125,6 +147,9 @@ int main(void)
 
 
     /* verification methode appelee */
+    //http_request * request; 
+    //parse_http_request( buffer , request );
+
     if(strcmp(buffer,"GET /inexistant HTTP/1.1\r\n")==0){ // ERREUR 404
         char* error = "HTTP/1.1 404 Not found\r\nConnection: close\r\nContent-Length: 18\r\n\r\n404 Not found\r\n";
         fprintf(f,arg,error);
