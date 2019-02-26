@@ -8,21 +8,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/socket.h>
+#include "http_parse.h"
 
-/*
-enum http_method {
-    HTTP_GET ,
-    HTTP_UNSUPPORTED ,
-};
-
-typedef struct {
-    enum http_method method ;
-    int major_version ;
-    int minor_version ;
-    char target [ MAX_TARGET_SIZE ];
-} http_request ;
-*/
-
+const int TAILLE_MAX = 255;
 char * fgets_or_exit ( char * buffer , int size , FILE * stream ){
     char * re = fgets(buffer,size,stream);
     if( re =='\0'){
@@ -87,6 +75,15 @@ void initialiser_signaux ( void ) {
    
 }
 
+void skip_headers(FILE *f) {
+    char* buffer = malloc(sizeof(char)*TAILLE_MAX);
+    char* arg = "%s";
+    fgets(buffer,TAILLE_MAX,f);
+    while(strcmp(buffer,"\r\n")!=0) {
+        printf(arg,buffer);
+        fgets(buffer,TAILLE_MAX,f);
+    }
+}
 
 int main(void)
 {
@@ -129,7 +126,7 @@ int main(void)
         }
     }    
  
-    const int TAILLE_MAX = 255;
+    
     FILE *f = fdopen(socket_client,"w+"); 
     char* buffer = malloc(sizeof(char)*TAILLE_MAX);
     char* arg = "%s";
@@ -147,9 +144,9 @@ int main(void)
 
 
     /* verification methode appelee */
-    //http_request * request; 
-    //parse_http_request( buffer , request );
-
+    http_request request; 
+    parse_http_request( buffer , &request );
+    
     if(strcmp(buffer,"GET /inexistant HTTP/1.1\r\n")==0){ // ERREUR 404
         char* error = "HTTP/1.1 404 Not found\r\nConnection: close\r\nContent-Length: 18\r\n\r\n404 Not found\r\n";
         fprintf(f,arg,error);
@@ -161,14 +158,7 @@ int main(void)
         fprintf(f,arg,error);
         exit(1);
     }
-    
-
-    /* lire ligne jusqu'à ligne vide */
-    fgets(buffer,TAILLE_MAX,f);
-    while(strcmp(buffer,"\r\n")!=0) {
-        printf(arg,buffer);
-        fgets(buffer,TAILLE_MAX,f);
-    }
+    skip_headers(f);
 
     /* requete correcte */
     arg = "%s %d%s";
