@@ -11,6 +11,7 @@
 #include "http_parse.h"
 
 const int TAILLE_MAX = 255;
+
 char * fgets_or_exit ( char * buffer , int size , FILE * stream ){
     char * re = fgets(buffer,size,stream);
     if( re =='\0'){
@@ -18,7 +19,6 @@ char * fgets_or_exit ( char * buffer , int size , FILE * stream ){
     }
     return re;
 }
-
 
 int freading(int socket_client) {
     const int TAILLE_MAX = 255;
@@ -76,36 +76,34 @@ void initialiser_signaux ( void ) {
 }
 
 void skip_headers(FILE *f) {
-    char* buffer = malloc(sizeof(char)*TAILLE_MAX);
+    char* buf = malloc(sizeof(char)*TAILLE_MAX);
     char* arg = "%s";
-    fgets(buffer,TAILLE_MAX,f);
-    while(strcmp(buffer,"\r\n")!=0) {
-        printf(arg,buffer);
-        fgets(buffer,TAILLE_MAX,f);
+    fgets_or_exit(buf,TAILLE_MAX,f);
+    while(strcmp(buf,"\r\n")!=0) {
+        printf(arg,buf);
+        fgets_or_exit(buf,TAILLE_MAX,f);
     }
 }
 
 void send_status( FILE * client , int code , const char * reason_phrase ){
-    fprintf(client,"%d%s%s",code,reason_phrase,"\r\n");
+    fprintf(client,"HTTP/1.1 %d %s\r\n",code,reason_phrase);
 }
 
 void send_response ( FILE * client , int code , const char * reason_phrase , const char * message_body ){
     send_status( client , code , reason_phrase );
-    int size = strlen(message_body); 
-    char* arg = "%s%d%s%s";
-    fprintf(client,arg,"Connection: close\r\nContent-Length:",size,"\r\n\r\n",message_body);
+    fprintf(client, "Connection: close\r\n");
+
+	int size = strlen(message_body);
+    printf("Content Length: %d\r\n",size);
+    
+    fprintf(client, "Content Length: %d\r\n",size);
+    fprintf(client, "\r\n%s\r\n",message_body);
 }
 
 int main(void)
 {
     /* message bienvenue */
     char * message_bienvenue = " _______                         __                          \n/       \\                       /  |                         \n███████  |  ______    _______  _██ |_     ______    ______   \n██ |__██ | /      \\  /       |/ ██   |   /      \\  /      \\  \n██    ██<  ██████  |/███████/ ██████/   /██████  | ██████  | \n███████  | /    ██ |██      \\   ██ | __ ██ |  ██/  /    ██ | \n██ |__██ |/███████ | ██████  |  ██ |/  |██ |      /███████ | \n██    ██/ ██    ██ |/     ██/   ██  ██/ ██ |      ██    ██ | \n███████/   ███████/ ███████/     ████/  ██_/       ███████/  \n\n\n\n";
-    /*size += strlen(message_bienvenue1) + strlen(message_bienvenue1) +  strlen(message_bienvenue2) +  strlen(message_bienvenue3) + 
-    strlen(message_bienvenue4) +  strlen(message_bienvenue5) +  strlen(message_bienvenue6) +  strlen(message_bienvenue7) + 
-    strlen(message_bienvenue8) + strlen(message_bienvenue9) + strlen(message_bienvenue10) + strlen(message_bienvenue11) + 
-    strlen(message_bienvenue12); */
-
-    
     
     /* initialisation */
     initialiser_signaux();
@@ -128,39 +126,29 @@ int main(void)
     }    
     
     FILE *f = fdopen(socket_client,"w+"); 
+    if(f == NULL){
+	    perror ("descripteur fichier socket client");
+	    exit(1);
+    }
     char* buffer = malloc(sizeof(char)*TAILLE_MAX);
     fgets_or_exit(buffer,TAILLE_MAX,f);
+    skip_headers(f);
 
 
     /* verification methode appelee */
     http_request request; 
 
-    
-
     if( !parse_http_request( buffer , &request ))
-        send_response( f, 400 , "Bad Request" , "Bad request\r\n" );
+        send_response( f, 400 , " Bad Request" , "Bad request\r\n" );
     else if( request.method == HTTP_UNSUPPORTED )
-        send_response( f , 405 , "Method Not Allowed" , "Method Not Allowed\r\n" );
+        send_response( f , 405 , " Method Not Allowed" , "Method Not Allowed\r\n" );
     else if( strcmp( request.target , "/" ) == 0)
         send_response( f , 200 , " OK " , message_bienvenue );
     else
-        send_response( f , 404 , "Not Found" , "Not Found \r\n");
+        send_response( f , 404 , " Not Found" , "Not Found \r\n");
 
-    /*
-    if(strcmp(buffer,"GET /inexistant HTTP/1.1\r\n")==0){ // ERREUR 404
-        send_response( f , 404 , "Not found", "Connection: close\r\nContent-Length: 18\r\n\r\n404 Not found\r\n" );
-        char* error = "HTTP/1.1 404 Not found\r\nConnection: close\r\nContent-Length: 18\r\n\r\n404 Not found\r\n";
-        fprintf(f,arg,error);
-        exit(404);
-    }
 
-    if(strcmp(buffer,"GET / HTTP/1.1\r\n")!=0){ // ERREUR 400
-        char * error = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: 17\r\n\r\n400 Bad request\r\n";
-        fprintf(f,arg,error);
-        exit(1);
-    }
-    */
-    skip_headers(f);
+    fclose(f);
+    exit(0);
 
-    return 0;
 }
