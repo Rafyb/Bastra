@@ -86,7 +86,7 @@ void skip_headers(FILE *f) {
 }
 
 void send_status( FILE * client , int code , const char * reason_phrase ){
-    fprintf(client,"%d %s%s",code,reason_phrase,"\r\n");
+    fprintf(client,"%d%s%s",code,reason_phrase,"\r\n");
 }
 
 void send_response ( FILE * client , int code , const char * reason_phrase , const char * message_body ){
@@ -146,7 +146,20 @@ int main(void)
     else
         send_response( f , 404 , "Not Found" , "Not Found \r\n");
 
+    /*
+    if(strcmp(buffer,"GET /inexistant HTTP/1.1\r\n")==0){ // ERREUR 404
+        send_response( f , 404 , "Not found", "Connection: close\r\nContent-Length: 18\r\n\r\n404 Not found\r\n" );
+        char* error = "HTTP/1.1 404 Not found\r\nConnection: close\r\nContent-Length: 18\r\n\r\n404 Not found\r\n";
+        fprintf(f,arg,error);
+        exit(404);
+    }
 
+    if(strcmp(buffer,"GET / HTTP/1.1\r\n")!=0){ // ERREUR 400
+        char * error = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: 17\r\n\r\n400 Bad request\r\n";
+        fprintf(f,arg,error);
+        exit(1);
+    }
+    */
     skip_headers(f);
 
     return 0;
