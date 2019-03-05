@@ -100,8 +100,20 @@ void send_response ( FILE * client , int code , const char * reason_phrase , con
     fprintf(client, "\r\n%s\r\n",message_body);
 }
 
-int main(void)
+char *rewrite_target(char *target) {
+    char* ok = strchr(target,'?');
+    char* res;
+    if(ok !=NULL) {
+       int size = strlen(target) - strlen(ok);
+       res = malloc(size);
+       strncpy(res,target,size);
+    }
+    return res;
+}
+
+int main(int argc,char** argv)
 {
+    
     /* message bienvenue */
     char * message_bienvenue = " _______                         __                          \n/       \\                       /  |                         \n███████  |  ______    _______  _██ |_     ______    ______   \n██ |__██ | /      \\  /       |/ ██   |   /      \\  /      \\  \n██    ██<  ██████  |/███████/ ██████/   /██████  | ██████  | \n███████  | /    ██ |██      \\   ██ | __ ██ |  ██/  /    ██ | \n██ |__██ |/███████ | ██████  |  ██ |/  |██ |      /███████ | \n██    ██/ ██    ██ |/     ██/   ██  ██/ ██ |      ██    ██ | \n███████/   ███████/ ███████/     ████/  ██_/       ███████/  \n\n\n\n";
     
