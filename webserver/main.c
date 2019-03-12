@@ -9,6 +9,9 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include "http_parse.h"
+#include <dirent.h>
+#include <sys/stat.h>
+
 
 const int TAILLE_MAX = 255;
 
@@ -101,18 +104,51 @@ void send_response ( FILE * client , int code , const char * reason_phrase , con
 }
 
 char *rewrite_target(char *target) {
+    
     char* ok = strchr(target,'?');
     char* res;
     if(ok !=NULL) {
+       // printf("%s\n",ok);
        int size = strlen(target) - strlen(ok);
        res = malloc(size);
        strncpy(res,target,size);
+    } else {
+        
+        return target;
     }
     return res;
 }
-
+FILE * check_and_open ( const char * target , const char * document_root ) {
+    struct stat buf;
+    //DIR *rep = opendir(argv[1]);
+    stat(document_root, &buf);
+    if(!S_ISDIR(buf.st_mode)) {
+        perror("erreur répertoire n'existe pas");
+        exit(1);
+    }
+    char* link = malloc(sizeof(char)*100);
+    //printf("%s%s",target,document_root);
+    strcat(link, document_root);
+    strcat(link,"/");
+    strcat(link,target);
+    //printf("%s",link);
+    FILE *f = fopen(link,"r");
+    if(f == NULL) {
+        perror("erreur fichier n'existe pas");
+        exit(1);
+    };
+    return f;
+}
 int main(int argc,char** argv)
 {
+    if(argc != 2) {
+        perror("erreur nombre d'arguments");
+        exit(1);
+    }
+    
+  
+   
+
     
     /* message bienvenue */
     char * message_bienvenue = " _______                         __                          \n/       \\                       /  |                         \n███████  |  ______    _______  _██ |_     ______    ______   \n██ |__██ | /      \\  /       |/ ██   |   /      \\  /      \\  \n██    ██<  ██████  |/███████/ ██████/   /██████  | ██████  | \n███████  | /    ██ |██      \\   ██ | __ ██ |  ██/  /    ██ | \n██ |__██ |/███████ | ██████  |  ██ |/  |██ |      /███████ | \n██    ██/ ██    ██ |/     ██/   ██  ██/ ██ |      ██    ██ | \n███████/   ███████/ ███████/     ████/  ██_/       ███████/  \n\n\n\n";
@@ -146,18 +182,21 @@ int main(int argc,char** argv)
     fgets_or_exit(buffer,TAILLE_MAX,f);
     skip_headers(f);
 
-
     /* verification methode appelee */
     http_request request; 
+    int http = parse_http_request( buffer , &request );
+    printf("%s\n",rewrite_target(request.target));
+    FILE* file = check_and_open("Jonas",argv[1]);
 
-    if( !parse_http_request( buffer , &request ))
+    if(!http)
         send_response( f, 400 , " Bad Request" , "Bad request\r\n" );
     else if( request.method == HTTP_UNSUPPORTED )
         send_response( f , 405 , " Method Not Allowed" , "Method Not Allowed\r\n" );
-    else if( strcmp( request.target , "/" ) == 0)
+    else if( file != NULL /*strcmp(request.target, "/")==0*/ )
         send_response( f , 200 , " OK " , message_bienvenue );
     else
         send_response( f , 404 , " Not Found" , "Not Found \r\n");
+
 
 
     fclose(f);

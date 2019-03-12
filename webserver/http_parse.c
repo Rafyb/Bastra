@@ -39,7 +39,6 @@
 
 int parse_http_request(const char *request_line , http_request *request)
 {
-
    if (strncmp(request_line, "GET ", 4) != 0)
    {
       request->method = HTTP_UNSUPPORTED;
